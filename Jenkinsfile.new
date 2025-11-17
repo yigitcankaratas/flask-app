@@ -1,0 +1,107 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = "flask-app"
+        DOCKER_IMAGE = "yck4756/flask-app"
+        REMOTE_SERVER = "your-remote-server.com"  // Diğer makinenizin IP/domain'i
+        REMOTE_USER = "your-username"             // SSH kullanıcı adı
+        DEPLOY_PATH = "/home/your-username/flask-app"  // Remote'daki proje yolu
+    }
+
+    triggers {
+        // GitHub'dan webhook geldiğinde otomatik çalışır
+        githubPush()
+        // Alternatif: her 5 dakikada kontrol et
+        pollSCM('H/5 * * * *')
+    }
+
+    stages {
+        stage('Checkout from GitHub') {
+            steps {
+                echo '🔹 Kod GitHub'dan çekiliyor...'
+                git branch: 'main', 
+                    url: 'https://github.com/yck4756/flask-app.git',
+                    credentialsId: 'github-credentials'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                echo '🧪 Testler çalıştırılıyor...'
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                    pip install pytest
+                    pytest --maxfail=1 --disable-warnings -q
+                '''
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo '🐳 Docker image oluşturuluyor...'
+                sh 'docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} .'
+                sh 'docker tag $DOCKER_IMAGE:${BUILD_NUMBER} $DOCKER_IMAGE:latest'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                echo '⬆️ Docker image Docker Hub'a gönderiliyor...'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push $DOCKER_IMAGE:${BUILD_NUMBER}
+                        docker push $DOCKER_IMAGE:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Remote Machine') {
+            steps {
+                echo '🚀 Diğer makinede deployment başlıyor...'
+                sshagent(['ssh-remote-credentials']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_SERVER "
+                            cd $DEPLOY_PATH || git clone https://github.com/yck4756/flask-app.git $DEPLOY_PATH
+                            cd $DEPLOY_PATH
+                            git pull origin main
+                            docker pull $DOCKER_IMAGE:latest
+                            docker-compose down || true
+                            docker-compose up -d
+                        "
+                    '''
+                }
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                echo '🏥 Sağlık kontrolü yapılıyor...'
+                script {
+                    sh '''
+                        sleep 10
+                        curl -f http://$REMOTE_SERVER:5000 || exit 1
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '🎉 Deploy işlemi başarıyla tamamlandı!'
+            // Slack/Email bildirimi gönderebilirsiniz
+        }
+        failure {
+            echo '❌ Pipeline başarısız oldu!'
+            // Hata bildirimi gönderebilirsiniz
+        }
+        always {
+            cleanWs()
+        }
+    }
+}
