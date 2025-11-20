@@ -1,1 +1,1 @@
-print("Hello Jenkins + Docker!?.")
+print("Hello Jenkins + Docker!")
