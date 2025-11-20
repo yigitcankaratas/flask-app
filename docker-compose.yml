@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  flask-app:
+    image: yck4756/flask-app:latest
+    container_name: flask-app-production
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=false
+      - SECRET_KEY=${SECRET_KEY:-production-secret-change-me}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - app-network
+    labels:
+      - "com.docker.compose.service=flask-app"
+
+  # Development service (comment out for production)
+  flask-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: flask-app-development
+    ports:
+      - "5001:5000"
+    volumes:
+      - .:/app
+      - /app/__pycache__
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=true
+    networks:
+      - app-network
+    profiles:
+      - dev
+
+networks:
+  app-network:
+    driver: bridge

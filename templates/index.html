@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Ana Sayfa - Flask Web App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="hero-section bg-primary text-white rounded p-5 mb-4">
+            <h1 class="display-4"><i class="fas fa-rocket"></i> Hoş Geldiniz!</h1>
+            <p class="lead">Bu modern Flask web uygulaması Docker, Jenkins ve Kubernetes teknolojileri ile geliştirilmiştir.</p>
+            <a class="btn btn-light btn-lg" href="{{ url_for('about') }}">
+                <i class="fas fa-info-circle"></i> Daha Fazla Bilgi
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-cogs"></i> Özellikler</h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Responsive tasarım</li>
+                            <li><i class="fas fa-check text-success"></i> REST API desteği</li>
+                            <li><i class="fas fa-check text-success"></i> Docker containerization</li>
+                            <li><i class="fas fa-check text-success"></i> Jenkins CI/CD</li>
+                            <li><i class="fas fa-check text-success"></i> Kubernetes deployment</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-chart-line"></i> Canlı İstatistikler</h5>
+                        <div class="stats-container">
+                            <div class="stat-item">
+                                <h3 class="text-primary">{{ visitors }}</h3>
+                                <p>Toplam Ziyaretçi</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3 class="text-success">{{ stats.total_requests }}</h3>
+                                <p>Toplam İstek</p>
+                            </div>
+                            {% if stats.last_visit %}
+                            <div class="stat-item">
+                                <small class="text-muted">Son Ziyaret: {{ stats.last_visit }}</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-code"></i> Teknoloji Stack</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <i class="fab fa-python fa-3x text-primary mb-2"></i>
+                        <h6>Python Flask</h6>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <i class="fab fa-docker fa-3x text-info mb-2"></i>
+                        <h6>Docker</h6>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-cubes fa-3x text-warning mb-2"></i>
+                        <h6>Kubernetes</h6>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <i class="fas fa-hammer fa-3x text-secondary mb-2"></i>
+                        <h6>Jenkins</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-tachometer-alt"></i> Sistem Durumu</h5>
+            </div>
+            <div class="card-body">
+                <div class="system-status">
+                    <div class="status-item">
+                        <span class="badge bg-success">ONLINE</span>
+                        <span>Uygulama Durumu</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="badge bg-success">HEALTHY</span>
+                        <span>API Durumu</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="badge bg-info">v1.0</span>
+                        <span>Sürüm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-link"></i> Hızlı Linkler</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('api_stats') }}" class="btn btn-outline-primary" target="_blank">
+                        <i class="fas fa-chart-bar"></i> API İstatistikleri
+                    </a>
+                    <a href="{{ url_for('health_check') }}" class="btn btn-outline-success" target="_blank">
+                        <i class="fas fa-heartbeat"></i> Health Check
+                    </a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline-info">
+                        <i class="fas fa-envelope"></i> İletişime Geç
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Canlı istatistikleri güncelle
+function updateStats() {
+    fetch('{{ url_for("api_stats") }}')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('visitor-count').textContent = data.visitors;
+            document.getElementById('request-count').textContent = data.total_requests;
+        })
+        .catch(error => console.log('Stats güncellenemedi:', error));
+}
+
+// Sayfa yüklendiğinde ve her 30 saniyede bir güncelle
+updateStats();
+setInterval(updateStats, 30000);
+</script>
+{% endblock %}

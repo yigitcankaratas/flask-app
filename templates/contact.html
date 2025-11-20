@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}İletişim - Flask Web App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3><i class="fas fa-envelope"></i> İletişim Formu</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Ad Soyad</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-posta</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Mesaj</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required placeholder="Mesajınızı buraya yazınız..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Mesaj Gönder
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-info-circle"></i> İletişim Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-globe text-primary"></i>
+                        <div>
+                            <strong>Web:</strong><br>
+                            <a href="https://github.com/yigitcankaratas" target="_blank">GitHub</a>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fab fa-docker text-info"></i>
+                        <div>
+                            <strong>Docker Hub:</strong><br>
+                            <a href="https://hub.docker.com/u/yck4756" target="_blank">yck4756</a>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-clock text-success"></i>
+                        <div>
+                            <strong>Çalışma Saatleri:</strong><br>
+                            7/24 Otomatik Deployment
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-question-circle"></i> Sık Sorulan Sorular</h5>
+            </div>
+            <div class="card-body">
+                <div class="faq">
+                    <div class="faq-item">
+                        <strong>Bu uygulama nasıl çalışıyor?</strong>
+                        <p class="small text-muted">Flask framework'ü kullanarak Python ile geliştirilmiş, Docker ile containerize edilmiş ve Kubernetes'te çalışıyor.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <strong>Kaynak kodunu görebilir miyim?</strong>
+                        <p class="small text-muted">Evet, tüm kaynak kod GitHub'da açık olarak paylaşılmıştır.</p>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <strong>API'yi nasıl kullanabilirim?</strong>
+                        <p class="small text-muted">/api/stats endpoint'ini kullanarak JSON formatında istatistikleri alabilirsiniz.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

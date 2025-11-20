@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Sayfa Bulunamadı{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <div class="error-page">
+        <h1 class="display-1 text-danger">404</h1>
+        <h2>Sayfa Bulunamadı</h2>
+        <p class="lead">Aradığınız sayfa mevcut değil veya taşınmış olabilir.</p>
+        
+        <div class="mt-4">
+            <a href="{{ url_for('home') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Ana Sayfaya Dön
+            </a>
+            <a href="{{ url_for('contact') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-envelope"></i> Yardım İste
+            </a>
+        </div>
+        
+        <div class="mt-5">
+            <i class="fas fa-search fa-5x text-muted"></i>
+        </div>
+    </div>
+</div>
+{% endblock %}
